@@ -8,7 +8,7 @@
 | นายชินชนกนันทร์ พรมศรี | chinchanoknantpromsri | Scrum Master |
 | นายพชรดล มูลสาระ |  | Scrum Master |
 | นายกิตติธร รูปสะอาด  | kittithonru-coder | Developer |
-| นายเตชสิทธิ์ แก้ววิเชียร  |  | Developer |
+| นายเตชสิทธิ์ แก้ววิเชียร  | Mik-kaewwichian | Developer |
 | นายพงษกร ศรีวิเศษ  |  | Developer |
 
 ## Branching Strategy
