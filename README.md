@@ -1,1 +1,1 @@
-# team-01-inventory
+# omegateam-01-inventory
