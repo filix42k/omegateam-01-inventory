@@ -2,11 +2,11 @@
 
 
 
-\## Velocity
+## Velocity
 
-\- Story point ที่วางแผน: \_\_\_ points
+- Story point ที่วางแผน: `___` points
 
-\- Story point ที่ทำสำเร็จ (Done): \_\_\_ points
+- Story point ที่ทำสำเร็จ (Done): `___` points
 
 \- Velocity Sprint 1: \_\_\_ points
 
