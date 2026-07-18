@@ -9,7 +9,7 @@
 | นายพชรดล มูลสาระ |  | Scrum Master |
 | นายกิตติธร รูปสะอาด  | kittithonru-coder | Developer |
 | นายเตชสิทธิ์ แก้ววิเชียร  | Mik-kaewwichian | Developer |
-| นายพงษกร ศรีวิเศษ  |  | Developer |
+| นายพงศกร ศรีวิเศษ  |  | Developer |
 
 ## Branching Strategy
 
