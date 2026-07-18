@@ -8,7 +8,7 @@
 
 - Story point ที่ทำสำเร็จ (Done): `___` points
 
-\- Velocity Sprint 1: \_\_\_ points
+- Velocity Sprint 1: `___` points
 
 
 
