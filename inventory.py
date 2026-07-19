@@ -41,34 +41,79 @@ def load_items():
         return items
 
 
+def save_all_items(items):
+    """ฟังก์ชันช่วยสำหรับเขียนข้อมูลทั้งหมดลงไฟล์ JSON"""
+    with open(DB_FILE, 'w', encoding='utf-8') as file:
+        json.dump(items, file, ensure_ascii=False, indent=4)
+
+
 def list_items():
-    """แสดงรายการสินค้าตามเงื่อนไข AC-1 และ AC-2"""
+    """แสดงรายการสินค้าทั้งหมด"""
     items = load_items()
 
-    # AC-2: Given ยังไม่มีสินค้าในระบบ | When เรียกคำสั่ง list | Then แสดงข้อความ "ยังไม่มีสินค้าในระบบ"
     if not items:
         print("ยังไม่มีสินค้าในระบบ")
         return
 
-    # AC-1: Given มีสินค้าอย่างน้อย 1 รายการ | When เรียกคำสั่ง list | Then แสดงชื่อ รหัส และจำนวนคงเหลือครบทุกรายการ
     print("📋 รายการสินค้าทั้งหมดในระบบ:")
     for item in items:
         print(f"รหัส: {item['id']} | ชื่อ: {item['name']} | จำนวนคงเหลือ: {item['quantity']}")
 
 
+# ==========================================
+# เพิ่มฟังก์ชันใหม่ตาม Task-04 (AC-1 & AC-2)
+# ==========================================
+
+def save_item(new_item):
+    """
+    บันทึกสินค้าใหม่ลงระบบ โดยทำการตรวจสอบรหัสซ้ำก่อนบันทึก
+    """
+    items = load_items()
+    
+    # AC-2: เช็กว่ามีรหัสสินค้า (id) นี้อยู่ในระบบแล้วหรือยัง
+    for item in items:
+        if item['id'] == new_item['id']:
+            print("รหัสสินค้าซ้ำ")  # แสดงข้อความปฏิเสธตาม AC-2 โดยไม่เขียนทับข้อมูลเดิม
+            return False
+            
+    # AC-1: หากไม่ซ้ำ บันทึกสินค้าใหม่ลงระบบ
+    items.append(new_item)
+    save_all_items(items)
+    print(f"✅ เพิ่มสินค้า '{new_item['name']}' เรียบร้อยแล้ว")
+    return True
+
+
 # ทดสอบการทำงานเมื่อรันไฟล์นี้โดยตรง
 if __name__ == "__main__":
-    print("--- ทดสอบ AC-1 (มีสินค้าในระบบ) ---")
+    print("--- [เตรียมระบบ] รีเซ็ตไฟล์ database สำหรับทดสอบ ---")
     if os.path.exists(DB_FILE):
         os.remove(DB_FILE)
-    create_initial_db()  # สร้างไฟล์พร้อมข้อมูลเริ่มต้น 2 รายการ
-    list_items()
+    create_initial_db() # จะได้รหัส 1 และ 2 มาเริ่มต้น
+    
+    print("\n" + "="*40 + "\n")
+
+    print("--- ทดสอบ AC-1 (เพิ่มสินค้าใหม่ที่รหัสไม่ซ้ำ) ---")
+    item_new = {
+        "id": 3,
+        "name": "Gaming Headset",
+        "category": "Electronics",
+        "price": 2500.00,
+        "quantity": 10
+    }
+    save_item(item_new)
+    list_items() # ควรจะเห็นรหัส 3 เพิ่มเข้ามาด้วย
 
     print("\n" + "-"*40 + "\n")
 
-    print("--- ทดสอบ AC-2 (ไม่มีสินค้าในระบบ) ---")
-    # จำลองสถานการณ์โดยการเคลียร์ข้อมูลในไฟล์ให้เป็นลิสต์ว่าง []
-    with open(DB_FILE, 'w', encoding='utf-8') as file:
-        json.dump([], file, ensure_ascii=False, indent=4)
-
+    print("--- ทดสอบ AC-2 (เพิ่มสินค้าด้วยรหัสเดิมที่ซ้ำ) ---")
+    item_duplicate = {
+        "id": 1, # รหัส 1 ซ้ำกับ Mechanical Keyboard
+        "name": "Wireless Charger",
+        "category": "Electronics",
+        "price": 990.00,
+        "quantity": 5
+    }
+    save_item(item_duplicate) # ควรขึ้นว่า "รหัสสินค้าซ้ำ" และไม่บันทึก
+    
+    print("\n--- ตรวจสอบข้อมูลในระบบอีกครั้ง (รหัส 1 ต้องไม่โดนเปลี่ยน) ---")
     list_items()
