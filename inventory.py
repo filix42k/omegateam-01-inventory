@@ -5,6 +5,7 @@ import os
 DATA_FILE = "items.json"
 
 
+# [US-01] Task-01: ออกแบบและสร้างไฟล์ฐานข้อมูลเริ่มต้น items.json (Assignee: kittithonru-coder)
 def create_initial_db(filename=DATA_FILE):
     
     if not os.path.exists(filename):
@@ -25,6 +26,7 @@ def create_initial_db(filename=DATA_FILE):
             json.dump(initial_items, file, ensure_ascii=False, indent=4)
 
 
+# Task: เขียนฟังก์ชัน load_items() อ่านข้อมูลจากไฟล์ JSON (อ้างอิง Issue #4)
 def load_items(filename=DATA_FILE):
     """อ่านข้อมูลสินค้าจากไฟล์ JSON และคืนค่าเป็น list"""
     if not os.path.exists(filename):
@@ -42,12 +44,14 @@ def load_items(filename=DATA_FILE):
         return []
 
 
+# Task: ฟังก์ชันบันทึกข้อมูลสินค้าลงในไฟล์ JSON
 def save_items(items, filename=DATA_FILE):
     """บันทึกข้อมูลสินค้าลงในไฟล์ JSON"""
     with open(filename, "w", encoding="utf-8") as file:
         json.dump(items, file, ensure_ascii=False, indent=4)
 
 
+# [US-01] Task-02: เขียนฟังก์ชันแสดงรายการสินค้าตามเงื่อนไข AC-1 และ AC-2 (Assignee: Mik-kaewwichian)
 def list_items(items):
     """แสดงรายการสินค้าทั้งหมดพร้อมจำนวนคงเหลือ"""
     if not items:
@@ -64,6 +68,7 @@ def list_items(items):
         print(f"{code:<12} {name:<25} {quantity:>12}")
 
 
+# [US-02] Task-03 & Task-04: ตรวจสอบ Validation รหัสซ้ำ และเพิ่มสินค้า (Assignee: Phongsakhon870, chinchanoknantpromsri)
 def add_item(items, code, name, quantity, filename=DATA_FILE):
     """เพิ่มสินค้าใหม่ โดยตรวจสอบรหัสซ้ำและจำนวนติดลบ"""
     if not (code.startswith('N') or code.startswith('P')):
@@ -95,6 +100,7 @@ def add_item(items, code, name, quantity, filename=DATA_FILE):
     return new_item
 
 
+# [US-03] Task-05: เขียนฟังก์ชันค้นหาและอัปเดตยอดคงเหลือ N + Input (Assignee: poom24052549-prog)
 def receive_stock(items, code, quantity, filename=DATA_FILE):
     """รับสินค้าเข้าและบันทึกจำนวนคงเหลือใหม่"""
     if quantity <= 0:
@@ -111,6 +117,7 @@ def receive_stock(items, code, quantity, filename=DATA_FILE):
     return None
 
 
+# [US-03] Task-06: เขียนระบบตรวจสอบเงื่อนไขไม่ให้จ่ายออกมากกว่าคงเหลือ (Assignee: filix42k)
 def issue_stock(items, code, quantity, filename=DATA_FILE):
     """จ่ายสินค้าออกโดยป้องกันจำนวนคงเหลือติดลบ"""
     if quantity <= 0:
