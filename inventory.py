@@ -1,230 +1,133 @@
 import json
 import os
 
-DB_FILE = 'items.json'
 
-def create_initial_db():
-    """สร้างไฟล์ items.json พร้อมข้อมูลเริ่มต้น หากยังไม่มีไฟล์"""
-    if not os.path.exists(DB_FILE):
+DATA_FILE = "items.json"
+
+
+def create_initial_db(filename=DATA_FILE):
+    
+    if not os.path.exists(filename):
         initial_items = [
             {
-                "id": 1,
+                "code": "N1001",
                 "name": "Mechanical Keyboard",
-                "category": "Electronics",
-                "price": 3200.00,
-                "quantity": 15
+                "quantity": 15,
             },
             {
-                "id": 2,
+                "code": "N1002",
                 "name": "Ergonomic Mouse",
-                "category": "Electronics",
-                "price": 1850.50,
-                "quantity": 30
-            }
+                "quantity": 30,
+            },
         ]
 
-        # เขียนข้อมูลลงไฟล์ JSON
-        with open(DB_FILE, 'w', encoding='utf-8') as file:
+        with open(filename, "w", encoding="utf-8") as file:
             json.dump(initial_items, file, ensure_ascii=False, indent=4)
-        print(f"✅ สร้างไฟล์ {DB_FILE} สำเร็จ")
-    else:
-        print(f"ℹ️ ไฟล์ {DB_FILE} มีอยู่แล้ว")
 
 
-def load_items():
-    """อ่านข้อมูลสินค้าทั้งหมดจากไฟล์ JSON"""
-    if not os.path.exists(DB_FILE):
+def load_items(filename=DATA_FILE):
+    """อ่านข้อมูลสินค้าจากไฟล์ JSON และคืนค่าเป็น list"""
+    if not os.path.exists(filename):
         return []
 
-    with open(DB_FILE, 'r', encoding='utf-8') as file:
-        items = json.load(file)
-        return items
+    try:
+        with open(filename, "r", encoding="utf-8") as file:
+            items = json.load(file)
+
+        if isinstance(items, list):
+            return items
+
+        return []
+    except (json.JSONDecodeError, OSError):
+        return []
 
 
-def save_all_items(items):
-    """ฟังก์ชันช่วยสำหรับเขียนข้อมูลทั้งหมดลงไฟล์ JSON"""
-    with open(DB_FILE, 'w', encoding='utf-8') as file:
+def save_items(items, filename=DATA_FILE):
+    """บันทึกข้อมูลสินค้าลงในไฟล์ JSON"""
+    with open(filename, "w", encoding="utf-8") as file:
         json.dump(items, file, ensure_ascii=False, indent=4)
 
 
-def list_items():
-    """แสดงรายการสินค้าทั้งหมด"""
-    items = load_items()
-
+def list_items(items):
+    """แสดงรายการสินค้าทั้งหมดพร้อมจำนวนคงเหลือ"""
     if not items:
         print("ยังไม่มีสินค้าในระบบ")
         return
 
-    print("📋 รายการสินค้าทั้งหมดในระบบ:")
+    print(f"{'รหัส':<12} {'ชื่อสินค้า':<25} {'จำนวนคงเหลือ':>12}")
+    print("-" * 52)
+
     for item in items:
-        print(f"รหัส: {item['id']} | ชื่อ: {item['name']} | จำนวนคงเหลือ: {item['quantity']}")
+        code = item.get("code", "-")
+        name = item.get("name", "-")
+        quantity = item.get("quantity", 0)
+        print(f"{code:<12} {name:<25} {quantity:>12}")
 
 
-# ==========================================
-# เพิ่มฟังก์ชันใหม่ตาม Task-04 (AC-1 & AC-2)
-# ==========================================
+def add_item(items, code, name, quantity, filename=DATA_FILE):
+    """เพิ่มสินค้าใหม่ โดยตรวจสอบรหัสซ้ำและจำนวนติดลบ"""
+    if not (code.startswith('N') or code.startswith('P')):
+        print("รหัสสินค้าต้องขึ้นต้นด้วย N (สำหรับสินค้าใหม่) หรือ P (สำหรับสินค้าที่เพิ่มจากตัวเดิม)")
+        return None
 
-def save_item(new_item):
-    """
-    บันทึกสินค้าใหม่ลงระบบ โดยทำการตรวจสอบรหัสซ้ำก่อนบันทึก
-    """
-    items = load_items()
-    
-    # AC-2: เช็กว่ามีรหัสสินค้า (id) นี้อยู่ในระบบแล้วหรือยัง
-    for item in items:
-        if item['id'] == new_item['id']:
-            print("รหัสสินค้าซ้ำ")  # แสดงข้อความปฏิเสธตาม AC-2 โดยไม่เขียนทับข้อมูลเดิม
-            return False
-            
-    # AC-1: หากไม่ซ้ำ บันทึกสินค้าใหม่ลงระบบ
+    if not code[1:].isdigit() or len(code) == 1:
+        print("รหัสสินค้าต้องตามด้วยตัวเลขเท่านั้น")
+        return None
+
+    duplicate = any(item.get("code") == code for item in items)
+
+    if duplicate:
+        print("รหัสสินค้าซ้ำ")
+        return None
+
+    if quantity < 0:
+        print("จำนวนสินค้าต้องไม่ติดลบ")
+        return None
+
+    new_item = {
+        "code": code,
+        "name": name,
+        "quantity": quantity,
+    }
+
     items.append(new_item)
-    save_all_items(items)
-    print(f"✅ เพิ่มสินค้า '{new_item['name']}' เรียบร้อยแล้ว")
-    return True
+    save_items(items, filename)
+    return new_item
 
 
-# ==========================================
-# เพิ่มฟังก์ชันใหม่ตาม Task-05 ค้นหาและอัปเดตยอดคงเหลือ N + Input
-# ==========================================
-
-def update_balance(item_id, n):
-    """
-    ค้นหาสินค้าจาก id และอัปเดตยอดคงเหลือตามจำนวน n 
-    (n เป็นบวก = เพิ่มสต็อก, n เป็นลบ = ลดสต็อก)
-    """
-    items = load_items()
-    is_found = False
+def receive_stock(items, code, quantity, filename=DATA_FILE):
+    """รับสินค้าเข้าและบันทึกจำนวนคงเหลือใหม่"""
+    if quantity <= 0:
+        print("จำนวนรับเข้าต้องมากกว่า 0")
+        return None
 
     for item in items:
-        if item['id'] == item_id:
-            # คำนวณยอดคงเหลือใหม่
-            new_quantity = item['quantity'] + n
-            
-            # ป้องกันไม่ให้ยอดคงเหลือติดลบ (Optional)
-            if new_quantity < 0:
-                print(f"⚠️ ยอดคงเหลือไม่เพียงพอ (คงเหลือ: {item['quantity']}, ต้องการลด: {abs(n)})")
-                return False
-                
-            item['quantity'] = new_quantity
-            is_found = True
-            print(f"🔄 อัปเดต '{item['name']}' สำเร็จ (ยอดคงเหลือใหม่: {item['quantity']})")
-            break
+        if item.get("code") == code:
+            item["quantity"] = item.get("quantity", 0) + quantity
+            save_items(items, filename)
+            return item
 
-    if is_found:
-        save_all_items(items)
-        return True
-    else:
-        print(f"❌ ไม่พบสินค้า รหัส {item_id} ในระบบ")
-        return False
+    print("ไม่พบสินค้า")
+    return None
 
 
-# ==========================================
-# ✨ เพิ่มฟังก์ชันใหม่ตาม [US-03] Task-06 (Issue #44)
-# ==========================================
-
-def withdraw_stock(item_id, amount_to_withdraw):
-    """
-    [US-03] Task-06: เขียนระบบตรวจสอบเงื่อนไขไม่ให้จ่ายออกมากกว่าคงเหลือ (AC-2) #44
-    """
-    # 1. ป้องกันกรอกค่าติดลบหรือศูนย์
-    if amount_to_withdraw <= 0:
-        print("❌ จำนวนที่ต้องการจ่ายออกต้องมากกว่า 0")
-        return False
-
-    items = load_items()
-    is_found = False
+def issue_stock(items, code, quantity, filename=DATA_FILE):
+    """จ่ายสินค้าออกโดยป้องกันจำนวนคงเหลือติดลบ"""
+    if quantity <= 0:
+        print("จำนวนจ่ายออกต้องมากกว่า 0")
+        return None
 
     for item in items:
-        if item['id'] == item_id:
-            is_found = True
-            current_stock = item['quantity']
+        if item.get("code") == code:
+            current_quantity = item.get("quantity", 0)
 
-            # 🚨 AC-2: ระบบตรวจสอบเงื่อนไขไม่ให้จ่ายออกมากกว่าคงเหลือ (ดักจับสต็อกติดลบ)
-            if amount_to_withdraw > current_stock:
-                print("จำนวนคงเหลือไม่พอ")  # แสดงข้อความแจ้งเตือนตามเกณฑ์ที่กำหนด
-                return False
+            if quantity > current_quantity:
+                print("จำนวนคงเหลือไม่พอ")
+                return None
 
-            # ✨ AC-1: หักยอดสินค้าออกได้ปกติในกรณีที่ยอดคงเหลือเพียงพอ
-            item['quantity'] = current_stock - amount_to_withdraw
-            print(f"✅ จ่ายออกสำเร็จ! '{item['name']}' ยอดคงเหลือใหม่: {item['quantity']}")
-            break
+            item["quantity"] = current_quantity - quantity
+            save_items(items, filename)
+            return item
 
-    if is_found:
-        save_all_items(items)
-        return True
-    else:
-        print(f"❌ ไม่พบสินค้า รหัส {item_id} ในระบบ")
-        return False
-
-
-# ทดสอบการทำงานเมื่อรันไฟล์นี้โดยตรง
-if __name__ == "__main__":
-    print("--- [เตรียมระบบ] รีเซ็ตไฟล์ database สำหรับทดสอบ ---")
-    if os.path.exists(DB_FILE):
-        os.remove(DB_FILE)
-    create_initial_db() # จะได้รหัส 1 และ 2 มาเริ่มต้น
-    
-    print("\n" + "="*40 + "\n")
-
-    print("--- ทดสอบ AC-1 (เพิ่มสินค้าใหม่ที่รหัสไม่ซ้ำ) ---")
-    item_new = {
-        "id": 3,
-        "name": "Gaming Headset",
-        "category": "Electronics",
-        "price": 2500.00,
-        "quantity": 10
-    }
-    save_item(item_new)
-    list_items() # ควรจะเห็นรหัส 3 เพิ่มเข้ามาด้วย
-
-    print("\n" + "-"*40 + "\n")
-
-    print("--- ทดสอบ AC-2 (เพิ่มสินค้าด้วยรหัสเดิมที่ซ้ำ) ---")
-    item_duplicate = {
-        "id": 1, # รหัส 1 ซ้ำกับ Mechanical Keyboard
-        "name": "Wireless Charger",
-        "category": "Electronics",
-        "price": 990.00,
-        "quantity": 5
-    }
-    save_item(item_duplicate) # ควรขึ้นว่า "รหัสสินค้าซ้ำ" และไม่บันทึก
-    
-    print("\n" + "="*40 + "\n")
-
-    print("--- ทดสอบ Task-05 (อัปเดตยอดคงเหลือ) ---")
-    # ทดสอบ 1: เพิ่มยอดคงเหลือ 5 ชิ้น ให้กับรหัส 1
-    print("[1] เพิ่มจำนวนสินค้า รหัส 1 อีก 5 ชิ้น")
-    update_balance(1, 5)
-
-    # ทดสอบ 2: ลดยอดคงเหลือ 10 ชิ้น จากรหัส 2
-    print("\n[2] ลดจำนวนสินค้า รหัส 2 ลง 10 ชิ้น")
-    update_balance(2, -10)
-    
-    # ทดสอบ 3: ลองลดจำนวนสินค้าจนติดลบ (เพื่อทดสอบการดักจับข้อผิดพลาด)
-    print("\n[3] ลองลดจำนวนสินค้า รหัส 3 ลง 20 ชิ้น (เกินสต็อกที่มี)")
-    update_balance(3, -20)
-
-    # ทดสอบ 4: อัปเดตสินค้าที่ไม่มีในระบบ
-    print("\n[4] อัปเดตสินค้า รหัส 99 ที่ไม่มีในระบบ")
-    update_balance(99, 10)
-
-
-    print("\n" + "="*40 + "\n")
-
-    # 🚀 ชุดทดสอบภารกิจของคุณข้าวฟ่าง [US-03] Task-06 (#44)
-    print("--- ทดสอบ [US-03] Task-06 (ระบบจ่ายสินค้าออกและดักจับค่าติดลบ) ---")
-    
-    # เคสที่ 1: จ่ายของออกได้ปกติ (มีของ 20 ชิ้น จ่ายออก 5 ชิ้น)
-    print("[1] ทดสอบจ่ายออกปกติ: รหัส 1 จ่ายออก 5 ชิ้น")
-    withdraw_stock(1, 5)
-
-    # เคสที่ 2: จ่ายของออกเกินสต็อก (รหัส 2 เหลืออยู่ 20 ชิ้น แต่พยายามจ่ายออก 25 ชิ้น)
-    print("\n[2] ทดสอบ AC-2 จ่ายออกมากกว่าคงเหลือ: รหัส 2 จ่ายออก 25 ชิ้น (ต้องขึ้น 'จำนวนคงเหลือไม่พอ')")
-    withdraw_stock(2, 25)
-
-    # เคสที่ 3: ค้นหารหัสสินค้าที่ไม่พบในระบบ
-    print("\n[3] ทดสอบจ่ายออกสินค้าที่ไม่มีอยู่จริง: รหัส 99 จ่ายออก 2 ชิ้น")
-    withdraw_stock(99, 2)
-
-    print("\n--- ตรวจสอบข้อมูลในระบบอีกครั้งหลังจากทำการอัปเดตทั้งหมด ---")
-    list_items()
+    print("ไม่พบสินค้า")
+    return None
