@@ -20,7 +20,7 @@
 
 ## Sprint Goal (Sprint 1)
 
-Sprint นี้ทีมจะส่งมอบระบบที่ดูรายการสินค้าและเพิ่มสินค้าใหม่ได้จริง และผ่าน acceptance criteria ครบทุกข้อ
+sprint นี้ทีมจะส่งมอบ US-01, US-02 และ US-03 ที่รันได้จริงผ่านเมนู Command Line เก็บข้อมูลด้วยไฟล์ JSON และผ่าน acceptance criteria ครบถ้วนทุกข้อ
 
 ## AI Usage Policy
 
