@@ -5,25 +5,11 @@ import os
 DATA_FILE = "items.json"
 
 
-# [US-01] Task-01: ออกแบบและสร้างไฟล์ฐานข้อมูลเริ่มต้น items.json (Assignee: kittithonru-coder)
+# [US-01] Task-01: สร้างไฟล์ฐานข้อมูลเริ่มต้น items.json แบบว่างเพื่อรองรับสถานะไม่มีสินค้า
 def create_initial_db(filename=DATA_FILE):
-    
     if not os.path.exists(filename):
-        initial_items = [
-            {
-                "code": "N1001",
-                "name": "Mechanical Keyboard",
-                "quantity": 15,
-            },
-            {
-                "code": "N1002",
-                "name": "Ergonomic Mouse",
-                "quantity": 30,
-            },
-        ]
-
         with open(filename, "w", encoding="utf-8") as file:
-            json.dump(initial_items, file, ensure_ascii=False, indent=4)
+            json.dump([], file, ensure_ascii=False, indent=4)
 
 
 # Task: เขียนฟังก์ชัน load_items() อ่านข้อมูลจากไฟล์ JSON (อ้างอิง Issue #4)
@@ -71,12 +57,15 @@ def list_items(items):
 # [US-02] Task-03 & Task-04: ตรวจสอบ Validation รหัสซ้ำ และเพิ่มสินค้า (Assignee: Phongsakhon870, chinchanoknantpromsri)
 def add_item(items, code, name, quantity, filename=DATA_FILE):
     """เพิ่มสินค้าใหม่ โดยตรวจสอบรหัสซ้ำและจำนวนติดลบ"""
-    if not (code.startswith('N') or code.startswith('P')):
-        print("รหัสสินค้าต้องขึ้นต้นด้วย N (สำหรับสินค้าใหม่) หรือ P (สำหรับสินค้าที่เพิ่มจากตัวเดิม)")
+    code = code.strip()
+    name = name.strip()
+
+    if not code:
+        print("กรุณากรอกรหัสสินค้า")
         return None
 
-    if not code[1:].isdigit() or len(code) == 1:
-        print("รหัสสินค้าต้องตามด้วยตัวเลขเท่านั้น")
+    if not name:
+        print("กรุณากรอกชื่อสินค้า")
         return None
 
     duplicate = any(item.get("code") == code for item in items)
@@ -103,8 +92,8 @@ def add_item(items, code, name, quantity, filename=DATA_FILE):
 # [US-03] Task-05: เขียนฟังก์ชันค้นหาและอัปเดตยอดคงเหลือ N + Input (Assignee: poom24052549-prog)
 def receive_stock(items, code, quantity, filename=DATA_FILE):
     """รับสินค้าเข้าและบันทึกจำนวนคงเหลือใหม่"""
-    if quantity <= 0:
-        print("จำนวนรับเข้าต้องมากกว่า 0")
+    if quantity < 0:
+        print("จำนวนรับเข้าต้องไม่ติดลบ")
         return None
 
     for item in items:
@@ -120,8 +109,8 @@ def receive_stock(items, code, quantity, filename=DATA_FILE):
 # [US-03] Task-06: เขียนระบบตรวจสอบเงื่อนไขไม่ให้จ่ายออกมากกว่าคงเหลือ (Assignee: filix42k)
 def issue_stock(items, code, quantity, filename=DATA_FILE):
     """จ่ายสินค้าออกโดยป้องกันจำนวนคงเหลือติดลบ"""
-    if quantity <= 0:
-        print("จำนวนจ่ายออกต้องมากกว่า 0")
+    if quantity < 0:
+        print("จำนวนจ่ายออกต้องไม่ติดลบ")
         return None
 
     for item in items:
