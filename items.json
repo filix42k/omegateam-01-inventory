@@ -1,17 +1,1 @@
-[
-    {
-        "code": "N1001",
-        "name": "Mechanical Keyboard",
-        "quantity": 35
-    },
-    {
-        "code": "N1002",
-        "name": "Ergonomic Mouse",
-        "quantity": 30
-    },
-    {
-        "code": "N1003",
-        "name": "Computer PC",
-        "quantity": 100
-    }
-]
+[]
